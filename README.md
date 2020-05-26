@@ -14,5 +14,5 @@ getGitlabEnv  --project 223 --gitlabURL https://gitlab.com
 
 ```
 brew tap thobianchi/tap
-brew install getGitlabEnv
+brew install thobianchi/tap/getgitlabenv
 ```

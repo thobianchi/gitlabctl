@@ -44,7 +44,7 @@ func exportVar(varName, value string) {
 func exportFileVar(varName, value string) {
 	file, err := ioutil.TempFile("/tmp", "GetGit_"+varName[0:8]+"_")
 	if err != nil {
-		log.Fatal("Failed to create temp var file: %v", err)
+		log.Fatalf("Failed to create temp var file: %v", err)
 	}
 	file.WriteString(value)
 	fmt.Printf("export %v='%v'\n", varName, file.Name())

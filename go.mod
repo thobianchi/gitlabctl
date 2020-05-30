@@ -1,4 +1,4 @@
-module github.com/thobianchi/getGitlabEnv
+module github.com/thobianchi/gitlabctl
 
 go 1.14
 

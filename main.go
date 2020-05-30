@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/thobianchi/getGitlabEnv/cmd"
+	"github.com/thobianchi/gitlabctl/cmd"
 )
 
 func main() {

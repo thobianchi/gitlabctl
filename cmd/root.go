@@ -18,6 +18,7 @@ var (
 				fmt.Println("GITLAB_TOKEN not set or empty")
 				os.Exit(2)
 			}
+			cmd.Help()
 		},
 	}
 	project     string

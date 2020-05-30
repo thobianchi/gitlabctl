@@ -1,4 +1,4 @@
-project_name: getGitlabEnv
+project_name: gitlabctl
 before:
   hooks:
     - go mod download
@@ -22,7 +22,7 @@ builds:
     flags:
       - -trimpath
     ldflags:
-      - -s -w -X github.com/thobianchi/getGitlabEnv/cmd.version={{.Version}} -X github.com/thobianchi/getGitlabEnv/cmd.commit={{.Commit}} -X github.com/thobianchi/getGitlabEnv/cmd.date={{.Date}}
+      - -s -w -X github.com/thobianchi/gitlabctl/cmd.version={{.Version}} -X github.com/thobianchi/gitlabctl/cmd.commit={{.Commit}} -X github.com/thobianchi/gitlabctl/cmd.date={{.Date}}
 signs:
   - artifacts: none
 
@@ -50,7 +50,7 @@ changelog:
 
 # Homebrews
 brews:
-  - name: getgitlabenv
+  - name: gitlabctl
     github:
       owner: thobianchi
       name: homebrew-tap
@@ -58,7 +58,7 @@ brews:
       name: thobianchi
       email: thomas.bianchi8@gmail.com
     folder: Formula
-    homepage: https://github.com/thobianchi/getGitlabEnv
+    homepage: https://github.com/thobianchi/gitlabctl
     description: Get Gitlab Project env Vars
     test: |
-      system "getGitlabEnv --version"
+      system "gitlabctl --version"

@@ -51,6 +51,20 @@ func writeConfig(cf configFile) {
 	}
 }
 
+func getCurrentContext() (context, error) {
+	cf := readConfig()
+	cur := cf.CurrentContext
+	if cur == "" {
+		return context{}, errors.New("Current context not set")
+	}
+	for _, ctx := range cf.Contexts {
+		if ctx.Name == cur {
+			return ctx, nil
+		}
+	}
+	return context{}, errors.New("Current context not found in configFile")
+}
+
 func SetContext(name, token, url string) {
 	cf := readConfig()
 	cf.CurrentContext = name

@@ -10,13 +10,17 @@ import (
 )
 
 // GetEnv get environment
-func GetEnv(token, project, url string) {
-	git, err := gitlab.NewClient(token, gitlab.WithBaseURL(url))
+func GetEnv(projectID string) {
+	ctx, err := getCurrentContext()
+	if err != nil {
+		log.Fatalf("Error getting current configuration: %v", err)
+	}
+	git, err := gitlab.NewClient(ctx.Token, gitlab.WithBaseURL(ctx.GitlabURL))
 	if err != nil {
 		log.Fatalf("Failed to create client: %v", err)
 	}
 
-	variables, _, err := git.ProjectVariables.ListVariables(project, nil)
+	variables, _, err := git.ProjectVariables.ListVariables(projectID, nil)
 	if err != nil {
 		fmt.Printf("Unable to fetch the variables:  %v\n", err)
 		os.Exit(1)

@@ -31,8 +31,7 @@ var setContextCmd = &cobra.Command{
 }
 var contextName string
 var token string
-
-// var gitlabURL string
+var gitlabURL string
 
 func init() {
 	configCmd.AddCommand(setContextCmd)

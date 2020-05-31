@@ -10,10 +10,10 @@ func init() {
 }
 
 var projectGetEnvCmd = &cobra.Command{
-	Use:   "get-env --id 1234",
+	Use:   "get-env",
 	Short: "Get remote project environment",
 	Long:  `Fetch remote environment variables and print out export statement`,
 	Run: func(cmd *cobra.Command, args []string) {
-		api.GetEnv(gitlabToken, project, gitlabURL)
+		api.GetEnv(project)
 	},
 }

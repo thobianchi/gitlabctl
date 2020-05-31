@@ -9,11 +9,11 @@ import (
 func init() {
 	rootCmd.AddCommand(projectCmd)
 
-	projectCmd.PersistentFlags().StringVar(&project, "project", "", "project id")
+	projectCmd.PersistentFlags().StringVar(&project, "id", "", "project id")
 	projectCmd.MarkPersistentFlagRequired("project")
-	projectCmd.PersistentFlags().StringVar(&gitlabURL, "gitlabURL", "", "complete gitlab url ex: <https://gitlab.com>")
-	projectCmd.MarkPersistentFlagRequired("gitlabURL")
 }
+
+var project string
 
 var projectCmd = &cobra.Command{
 	Use:     "project",

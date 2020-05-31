@@ -14,16 +14,9 @@ var (
 		Long: `gitlabctl is a Command line utility to interacto with Gitlab
     is allows you to fetch remote project environemnt, launch pipeline and much more`,
 		Run: func(cmd *cobra.Command, args []string) {
-			if gitlabToken == "" {
-				fmt.Println("GITLAB_TOKEN not set or empty")
-				os.Exit(2)
-			}
 			cmd.Help()
 		},
 	}
-	project     string
-	gitlabURL   string
-	gitlabToken string
 )
 
 // Execute cobra execute CLI
@@ -35,5 +28,4 @@ func Execute() {
 }
 
 func init() {
-	gitlabToken = os.Getenv("GITLAB_TOKEN")
 }

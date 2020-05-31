@@ -16,18 +16,18 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
+	"github.com/thobianchi/gitlabctl/api"
 )
 
 // getContextCmd represents the getContext command
 var getContextCmd = &cobra.Command{
-	Use:   "get-contexts",
-	Short: "Get all configuration contexts",
-	Long:  `Retrieve a list of contexts configured`,
+	Use:     "get-contexts",
+	Aliases: []string{"get-context"},
+	Short:   "Get all configuration contexts",
+	Long:    `Retrieve a list of contexts configured`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("getContext called")
+		api.GetContexts()
 	},
 }
 

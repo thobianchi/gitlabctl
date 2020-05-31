@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -67,4 +68,37 @@ func SetContext(name, token, url string) {
 	}
 	cf.Contexts = append(cf.Contexts, newConfig)
 	writeConfig(cf)
+}
+
+func UseContext(name string) {
+	cf := readConfig()
+	var found bool = false
+	for _, ctx := range cf.Contexts {
+		if ctx.Name == name {
+			found = true
+		}
+	}
+	if found {
+		cf.CurrentContext = name
+		writeConfig(cf)
+	} else {
+		log.Fatalf("Context: %v not found in config file", name)
+	}
+}
+
+func GetContexts() {
+	cf := readConfig()
+	for _, ctx := range cf.Contexts {
+		fmt.Println(ctx.Name)
+	}
+}
+
+func CurrentContext() {
+	cf := readConfig()
+	cc := cf.CurrentContext
+	if cc != "" {
+		fmt.Println(cf.CurrentContext)
+	} else {
+		log.Fatalf("current-context is not set")
+	}
 }

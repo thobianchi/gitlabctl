@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/thobianchi/gitlabctl/api"
+	"github.com/thobianchi/gitlabctl/sdk"
 )
 
 func init() {
@@ -14,6 +14,6 @@ var projectGetEnvCmd = &cobra.Command{
 	Short: "Get remote project environment",
 	Long:  `Fetch remote environment variables and print out export statement`,
 	Run: func(cmd *cobra.Command, args []string) {
-		api.GetEnv(project)
+		sdk.GetEnv(project)
 	},
 }

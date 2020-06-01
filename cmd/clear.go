@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/thobianchi/gitlabctl/api"
+	"github.com/thobianchi/gitlabctl/sdk"
 )
 
 func init() {
@@ -15,6 +15,6 @@ var cleanCmd = &cobra.Command{
 	Long:  `Delete files created by for example project get-env`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// Root command does nothing
-		api.Clean()
+		sdk.Clean()
 	},
 }

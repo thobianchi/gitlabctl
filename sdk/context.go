@@ -29,7 +29,7 @@ type configFile struct {
 func getHome() string {
 	home, err := os.UserHomeDir()
 	if err != nil {
-		log.Fatalf("Can't find user home directory:", err)
+		log.Fatalf("Can't find user home directory:%s\n", err)
 	}
 	return home
 }

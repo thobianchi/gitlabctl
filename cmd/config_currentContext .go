@@ -11,8 +11,12 @@ var currentContextCmd = &cobra.Command{
 	Short: "Get current defined context",
 	Long: `Get currently defined context, all calls will refer to this gitlab server, with the configured
   secret and config`,
-	Run: func(cmd *cobra.Command, args []string) {
-		sdk.CurrentContext()
+	RunE: func(cmd *cobra.Command, args []string) error {
+		err := sdk.CurrentContext()
+		if err != nil {
+			return err
+		}
+		return nil
 	},
 }
 

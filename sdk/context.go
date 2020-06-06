@@ -4,15 +4,14 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 
 	"gopkg.in/yaml.v2"
 )
 
 var (
-	configFileName string      = getHome() + string(os.PathSeparator) + ".gitlabctl"
-	confFile       *configFile = nil
+	configFileName string
+	confFile       *configFile
 )
 
 type context struct {
@@ -26,48 +25,71 @@ type configFile struct {
 	Contexts       []context `yaml:",omitempty"`
 }
 
-func getHome() string {
+func getConfigFileName() (string, error) {
+	if configFileName == "" {
+		cf, err := getHome()
+		if err != nil {
+			return "", err
+		}
+		configFileName = cf + string(os.PathSeparator) + ".gitlabctl"
+	}
+	return configFileName, nil
+}
+
+func getHome() (string, error) {
 	home, err := os.UserHomeDir()
 	if err != nil {
-		log.Fatalf("Can't find user home directory:%s\n", err)
+		return "", err
 	}
-	return home
+	return home, nil
 }
 
-func getConfig() *configFile {
+func getConfig() (*configFile, error) {
 	if confFile == nil {
-		confFile = readConfig()
+		cf, err := readConfig()
+		if err != nil {
+			return nil, err
+		}
+		confFile = cf
 	}
-	return confFile
+	return confFile, nil
 }
 
-func readConfig() *configFile {
+func readConfig() (*configFile, error) {
 	cf := configFile{}
-	yamlFile, err := ioutil.ReadFile(configFileName)
+	cfName, err := getConfigFileName()
+	if err != nil {
+		return nil, err
+	}
+	yamlFile, err := ioutil.ReadFile(cfName)
 	if errors.Is(err, os.ErrNotExist) {
 		yamlFile = []byte{}
 	} else if err != nil {
-		log.Fatalf("Failed open file %v: %v", configFileName, err)
+		return nil, err
 	}
 	err = yaml.Unmarshal(yamlFile, &cf)
 	if err != nil {
-		log.Fatalf("Error unmarshaling config yaml: %v", err)
+		return nil, err
 	}
-	return &cf
+	return &cf, nil
 }
 
-func writeConfig(cf *configFile) {
+func writeConfig(cf *configFile) error {
 	d, err := yaml.Marshal(&cf)
 	if err != nil {
-		log.Fatalf("marshal configFile error: %v", err)
+		return err
 	}
 	if err := ioutil.WriteFile(configFileName, d, 0644); err != nil {
-		log.Fatalf("Error writing config file %v: %v", configFileName, err)
+		return err
 	}
+	return nil
 }
 
 func getCurrentContext() (context, error) {
-	cf := getConfig()
+	cf, err := getConfig()
+	if err != nil {
+		return context{}, err
+	}
 	cur := cf.CurrentContext
 	if cur == "" {
 		return context{}, errors.New("Current context not set")
@@ -80,8 +102,11 @@ func getCurrentContext() (context, error) {
 	return context{}, errors.New("Current context not found in configFile")
 }
 
-func SetContext(name, token, url string) {
-	cf := getConfig()
+func SetContext(name, token, url string) error {
+	cf, err := getConfig()
+	if err != nil {
+		return err
+	}
 	cf.CurrentContext = name
 	newConfig := context{
 		Name:      name,
@@ -91,16 +116,24 @@ func SetContext(name, token, url string) {
 	for i, ctx := range cf.Contexts {
 		if name == ctx.Name {
 			cf.Contexts[i] = newConfig
-			writeConfig(cf)
-			return
+			if err := writeConfig(cf); err != nil {
+				return err
+			}
+			return nil
 		}
 	}
 	cf.Contexts = append(cf.Contexts, newConfig)
-	writeConfig(cf)
+	if err := writeConfig(cf); err != nil {
+		return err
+	}
+	return nil
 }
 
-func UseContext(name string) {
-	cf := getConfig()
+func UseContext(name string) error {
+	cf, err := getConfig()
+	if err != nil {
+		return err
+	}
 	var found bool = false
 	for _, ctx := range cf.Contexts {
 		if ctx.Name == name {
@@ -113,21 +146,30 @@ func UseContext(name string) {
 	} else {
 		fmt.Fprintf(os.Stderr, "Context %v: not found in config file\n", name)
 	}
+	return nil
 }
 
-func GetContexts() {
-	cf := getConfig()
+func GetContexts() error {
+	cf, err := getConfig()
+	if err != nil {
+		return err
+	}
 	for _, ctx := range cf.Contexts {
 		fmt.Println(ctx.Name)
 	}
+	return nil
 }
 
-func CurrentContext() {
-	cf := getConfig()
+func CurrentContext() error {
+	cf, err := getConfig()
+	if err != nil {
+		return err
+	}
 	cc := cf.CurrentContext
 	if cc != "" {
 		fmt.Println(cf.CurrentContext)
 	} else {
 		fmt.Fprintln(os.Stderr, "current-context is not set")
 	}
+	return nil // TODO return strings print in another func
 }

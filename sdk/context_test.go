@@ -6,7 +6,7 @@ import (
 )
 
 func TestGetHome(t *testing.T) {
-	home := getHome()
+	home, _ := getHome()
 	if reflect.TypeOf(home).Kind() != reflect.String {
 		t.Errorf("GetHome does not return string")
 	}

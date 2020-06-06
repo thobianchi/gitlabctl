@@ -11,8 +11,12 @@ var getContextCmd = &cobra.Command{
 	Aliases: []string{"get-context"},
 	Short:   "Get all configuration contexts",
 	Long:    `Retrieve a list of contexts configured`,
-	Run: func(cmd *cobra.Command, args []string) {
-		sdk.GetContexts()
+	RunE: func(cmd *cobra.Command, args []string) error {
+		err := sdk.GetContexts()
+		if err != nil {
+			return err
+		}
+		return nil
 	},
 }
 

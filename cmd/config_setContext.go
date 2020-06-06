@@ -10,8 +10,12 @@ var setContextCmd = &cobra.Command{
 	Use:   "set-context",
 	Short: "Configure a new or update a context",
 	Long:  `Configure a context for future use, `,
-	Run: func(cmd *cobra.Command, args []string) {
-		sdk.SetContext(contextName, token, gitlabURL)
+	RunE: func(cmd *cobra.Command, args []string) error {
+		err := sdk.SetContext(contextName, token, gitlabURL)
+		if err != nil {
+			return err
+		}
+		return nil
 	},
 }
 var contextName string

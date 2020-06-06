@@ -11,7 +11,8 @@ import (
 )
 
 var (
-	configFileName string = getHome() + string(os.PathSeparator) + ".gitlabctl"
+	configFileName string      = getHome() + string(os.PathSeparator) + ".gitlabctl"
+	confFile       *configFile = nil
 )
 
 type context struct {
@@ -33,7 +34,14 @@ func getHome() string {
 	return home
 }
 
-func readConfig() configFile {
+func getConfig() *configFile {
+	if confFile == nil {
+		confFile = readConfig()
+	}
+	return confFile
+}
+
+func readConfig() *configFile {
 	cf := configFile{}
 	yamlFile, err := ioutil.ReadFile(configFileName)
 	if errors.Is(err, os.ErrNotExist) {
@@ -45,22 +53,21 @@ func readConfig() configFile {
 	if err != nil {
 		log.Fatalf("Error unmarshaling config yaml: %v", err)
 	}
-	return cf
+	return &cf
 }
 
-func writeConfig(cf configFile) {
+func writeConfig(cf *configFile) {
 	d, err := yaml.Marshal(&cf)
 	if err != nil {
 		log.Fatalf("marshal configFile error: %v", err)
 	}
-	err = ioutil.WriteFile(configFileName, d, 0644)
-	if err != nil {
+	if err := ioutil.WriteFile(configFileName, d, 0644); err != nil {
 		log.Fatalf("Error writing config file %v: %v", configFileName, err)
 	}
 }
 
 func getCurrentContext() (context, error) {
-	cf := readConfig()
+	cf := getConfig()
 	cur := cf.CurrentContext
 	if cur == "" {
 		return context{}, errors.New("Current context not set")
@@ -74,7 +81,7 @@ func getCurrentContext() (context, error) {
 }
 
 func SetContext(name, token, url string) {
-	cf := readConfig()
+	cf := getConfig()
 	cf.CurrentContext = name
 	newConfig := context{
 		Name:      name,
@@ -93,7 +100,7 @@ func SetContext(name, token, url string) {
 }
 
 func UseContext(name string) {
-	cf := readConfig()
+	cf := getConfig()
 	var found bool = false
 	for _, ctx := range cf.Contexts {
 		if ctx.Name == name {
@@ -104,23 +111,23 @@ func UseContext(name string) {
 		cf.CurrentContext = name
 		writeConfig(cf)
 	} else {
-		log.Fatalf("Context: %v not found in config file", name)
+		fmt.Fprintf(os.Stderr, "Context %v: not found in config file\n", name)
 	}
 }
 
 func GetContexts() {
-	cf := readConfig()
+	cf := getConfig()
 	for _, ctx := range cf.Contexts {
 		fmt.Println(ctx.Name)
 	}
 }
 
 func CurrentContext() {
-	cf := readConfig()
+	cf := getConfig()
 	cc := cf.CurrentContext
 	if cc != "" {
 		fmt.Println(cf.CurrentContext)
 	} else {
-		log.Fatalf("current-context is not set")
+		fmt.Fprintln(os.Stderr, "current-context is not set")
 	}
 }

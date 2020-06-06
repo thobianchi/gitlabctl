@@ -10,8 +10,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const (
-	configFileName string = "/home/thobianchi/.gitlabctl"
+var (
+	configFileName string = getHome() + string(os.PathSeparator) + ".gitlabctl"
 )
 
 type context struct {
@@ -23,6 +23,14 @@ type context struct {
 type configFile struct {
 	CurrentContext string    `yaml:",omitempty"`
 	Contexts       []context `yaml:",omitempty"`
+}
+
+func getHome() string {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatalf("Can't find user home directory:", err)
+	}
+	return home
 }
 
 func readConfig() configFile {

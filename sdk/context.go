@@ -25,9 +25,12 @@ type configFile struct {
 	Contexts       []context `yaml:",omitempty"`
 }
 
-func getConfigFileName() (string, error) {
+type homeGetter func() (string, error)
+type configReader func() (*configFile, error)
+
+func getConfigFileName(getHomeFunc homeGetter) (string, error) {
 	if configFileName == "" {
-		cf, err := getHome()
+		cf, err := getHomeFunc()
 		if err != nil {
 			return "", err
 		}
@@ -44,9 +47,9 @@ func getHome() (string, error) {
 	return home, nil
 }
 
-func getConfig() (*configFile, error) {
+func getConfig(readCfg configReader) (*configFile, error) {
 	if confFile == nil {
-		cf, err := readConfig()
+		cf, err := readCfg()
 		if err != nil {
 			return nil, err
 		}
@@ -57,7 +60,7 @@ func getConfig() (*configFile, error) {
 
 func readConfig() (*configFile, error) {
 	cf := configFile{}
-	cfName, err := getConfigFileName()
+	cfName, err := getConfigFileName(getHome)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +89,7 @@ func writeConfig(cf *configFile) error {
 }
 
 func getCurrentContext() (context, error) {
-	cf, err := getConfig()
+	cf, err := getConfig(readConfig)
 	if err != nil {
 		return context{}, err
 	}
@@ -103,7 +106,7 @@ func getCurrentContext() (context, error) {
 }
 
 func SetContext(name, token, url string) error {
-	cf, err := getConfig()
+	cf, err := getConfig(readConfig)
 	if err != nil {
 		return err
 	}
@@ -130,7 +133,7 @@ func SetContext(name, token, url string) error {
 }
 
 func UseContext(name string) error {
-	cf, err := getConfig()
+	cf, err := getConfig(readConfig)
 	if err != nil {
 		return err
 	}
@@ -150,7 +153,7 @@ func UseContext(name string) error {
 }
 
 func GetContexts() error {
-	cf, err := getConfig()
+	cf, err := getConfig(readConfig)
 	if err != nil {
 		return err
 	}
@@ -161,7 +164,7 @@ func GetContexts() error {
 }
 
 func CurrentContext() error {
-	cf, err := getConfig()
+	cf, err := getConfig(readConfig)
 	if err != nil {
 		return err
 	}

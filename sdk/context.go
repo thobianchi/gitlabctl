@@ -105,6 +105,7 @@ func getCurrentContext() (context, error) {
 	return context{}, errors.New("Current context not found in configFile")
 }
 
+// SetContext main function of set-context command
 func SetContext(name, token, url string) error {
 	cf, err := getConfig(readConfig)
 	if err != nil {
@@ -132,6 +133,7 @@ func SetContext(name, token, url string) error {
 	return nil
 }
 
+// UseContext main function of use-context command
 func UseContext(name string) error {
 	cf, err := getConfig(readConfig)
 	if err != nil {
@@ -152,6 +154,7 @@ func UseContext(name string) error {
 	return nil
 }
 
+// GetContexts main function of get-contexts command
 func GetContexts() error {
 	cf, err := getConfig(readConfig)
 	if err != nil {
@@ -163,6 +166,7 @@ func GetContexts() error {
 	return nil
 }
 
+// CurrentContext main function of current-context command
 func CurrentContext() error {
 	cf, err := getConfig(readConfig)
 	if err != nil {

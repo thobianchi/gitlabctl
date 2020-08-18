@@ -17,7 +17,7 @@ cover:  ## Run test coverage suite
 
 build:  ## Builds the CLI
 	@go build \
-	-ldflags "-w -s -X ${PACKAGE}/cmd.version=${VERSION} -X ${PACKAGE}/cmd.commit=${GIT} -X ${PACKAGE}/cmd.date=${DATE}" \
+	-v -ldflags "-w -s -X ${PACKAGE}/cmd.version=${VERSION} -X ${PACKAGE}/cmd.commit=${GIT} -X ${PACKAGE}/cmd.date=${DATE}" \
 	-a -tags netgo -o bin/${NAME} main.go
 
 img:    ## Build Docker Image

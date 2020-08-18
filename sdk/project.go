@@ -11,13 +11,10 @@ import (
 
 // GetEnv get environment
 func GetEnv(projectID string) {
-	ctx, err := getCurrentContext()
+
+	git, err := getGitClient()
 	if err != nil {
-		log.Fatalf("Error getting current configuration: %v", err)
-	}
-	git, err := gitlab.NewClient(ctx.Token, gitlab.WithBaseURL(ctx.GitlabURL))
-	if err != nil {
-		log.Fatalf("Failed to create client: %v", err)
+		log.Fatalf("Failed to get git client: %v", err)
 	}
 
 	variables, _, err := git.ProjectVariables.ListVariables(projectID, nil)

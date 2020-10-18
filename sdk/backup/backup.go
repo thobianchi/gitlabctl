@@ -1,4 +1,4 @@
-package sdk
+package backup
 
 import (
 	"errors"
@@ -9,7 +9,9 @@ import (
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/transport/ssh"
-	"github.com/xanzy/go-gitlab"
+	"github.com/thobianchi/gitlabctl/internal/gitlab"
+	"github.com/thobianchi/gitlabctl/sdk/context"
+	gogitlab "github.com/xanzy/go-gitlab"
 )
 
 var (
@@ -23,8 +25,8 @@ func printGroupsFound(groupsFound *[]string) {
 	}
 }
 
-func getGroupBySearch(gitClient *gitlab.Client, groupName string, ID int) (*gitlab.Group, error) {
-	groups, _, err := gitClient.Groups.SearchGroup(groupName)
+func getGroupBySearch(gitClient gitlab.IClient, groupName string, ID int) (*gogitlab.Group, error) {
+	groups, err := gitClient.SearchGroup(groupName)
 	if err != nil {
 		return nil, err
 	}
@@ -69,12 +71,12 @@ func cloneRepo(path string, url string) error {
 	return err
 }
 
-func traverseGroup(gitClient *gitlab.Client, group *gitlab.Group, clonePath string) error {
+func traverseGroup(gitClient gitlab.IClient, group *gogitlab.Group, clonePath string) error {
 	err := createGroupDir(clonePath, group.FullPath)
 	if err != nil {
 		return err
 	}
-	repos, _, err := gitClient.Groups.ListGroupProjects(group.ID, nil)
+	repos, err := gitClient.ListGroupProjects(group.ID)
 	if err != nil {
 		return err
 	}
@@ -86,16 +88,12 @@ func traverseGroup(gitClient *gitlab.Client, group *gitlab.Group, clonePath stri
 			return err
 		}
 	}
-	subGroups, _, err := gitClient.Groups.ListSubgroups(group.ID, nil)
+	subGroups, err := gitClient.ListSubgroups(group.ID)
 	if err != nil {
 		return err
 	}
 	for _, subGroup := range subGroups {
-		git, err := getGitClient()
-		if err != nil {
-			return err
-		}
-		traverseGroup(git, subGroup, clonePath)
+		traverseGroup(gitClient, subGroup, clonePath)
 	}
 	return nil
 }
@@ -109,11 +107,17 @@ func ensureClonePath(dirName string) error {
 
 // Backup main function of backup command
 func Backup(groupName string, groupID int, clonePath string) error {
-	git, err := getGitClient()
+	ctx, err := context.GetCurrentContext()
 	if err != nil {
 		return err
 	}
-	group, err := getGroupBySearch(git, groupName, groupID)
+
+	client, err := gitlab.NewClient(ctx)
+	if err != nil {
+		return err
+	}
+
+	group, err := getGroupBySearch(client, groupName, groupID)
 	if err != nil {
 		return err
 	}
@@ -121,5 +125,5 @@ func Backup(groupName string, groupID int, clonePath string) error {
 	if err != nil {
 		return err
 	}
-	return traverseGroup(git, group, clonePath)
+	return traverseGroup(client, group, clonePath)
 }

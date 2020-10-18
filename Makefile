@@ -1,27 +1,40 @@
-NAME    := gitlabctl
-PACKAGE := github.com/thobianchi/$(NAME)
-GIT     := $(shell git rev-parse --short HEAD)
-DATE    := $(shell date -u +%FT%T%Z)
-VERSION  ?= $(shell git describe --tags)
-IMG_NAME := thobianchi/gitlabctl
-IMAGE    := ${IMG_NAME}:${VERSION}
+BUILD_FILES = $(shell go list -f '{{range .GoFiles}}{{$$.Dir}}/{{.}}\
+{{end}}' ./...)
+GITLABCTL_VERSION ?= $(shell git describe --tags 2>/dev/null || git rev-parse --short HEAD)
+DATE_FMT = +%Y-%m-%d
+ifdef SOURCE_DATE_EPOCH
+    BUILD_DATE ?= $(shell date -u -d "@$(SOURCE_DATE_EPOCH)" "$(DATE_FMT)" 2>/dev/null || date -u -r "$(SOURCE_DATE_EPOCH)" "$(DATE_FMT)" 2>/dev/null || date -u "$(DATE_FMT)")
+else
+    BUILD_DATE ?= $(shell date "$(DATE_FMT)")
+endif
 
-default: help
+ifndef CGO_CPPFLAGS
+    export CGO_CPPFLAGS := $(CPPFLAGS)
+endif
+ifndef CGO_CFLAGS
+    export CGO_CFLAGS := $(CFLAGS)
+endif
+ifndef CGO_LDFLAGS
+    export CGO_LDFLAGS := $(LDFLAGS)
+endif
 
-test:   ## Run all tests
-	@go clean --testcache && go test -race ./...
+GO_LDFLAGS := -X github.com/thobianchi/gitlabctl/internal/cli.Version=$(GITLABCTL_VERSION) $(GO_LDFLAGS)
+GO_LDFLAGS := -X github.com/thobianchi/gitlabctl/internal/cli.BuildDate=$(BUILD_DATE) $(GO_LDFLAGS)
 
-cover:  ## Run test coverage suite
-	@go test ./... -race --coverprofile=cov.out
-	@go tool cover --html=cov.out
+.PHONY: all build test clean
 
-build:  ## Builds the CLI
-	@go build \
-	-v -ldflags "-w -s -X ${PACKAGE}/cmd.version=${VERSION} -X ${PACKAGE}/cmd.commit=${GIT} -X ${PACKAGE}/cmd.date=${DATE}" \
-	-a -tags netgo -o bin/${NAME} main.go
+all: clean coverage build
 
-img:    ## Build Docker Image
-	@docker build --rm -t ${IMAGE} .
+build: $(BUILD_FILES)
+	go build -trimpath -ldflags "$(GO_LDFLAGS)" -o "./bin/gitlabctl" ./cmd/gitlabctl
 
-help:
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":[^:]*?## "}; {printf "\033[38;5;69m%-30s\033[38;5;38m %s\033[0m\n", $$1, $$2}'
+test:
+	go test -race ./... --coverprofile=coverage.out
+
+coverage: test
+	go tool cover -func=coverage.out
+
+clean:
+	rm -rf ./bin/gitlabctl
+	go clean -cache
+	rm -rf *.out

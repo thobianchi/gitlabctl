@@ -1,4 +1,4 @@
-package sdk
+package context
 
 import (
 	"errors"
@@ -53,8 +53,8 @@ func TestGetConfigFileName(t *testing.T) {
 	})
 }
 
-var mockContext = context{Name: "Name", Token: "dsajkhkg", GitlabURL: "https://example.com"}
-var mockCfg *configFile = &configFile{CurrentContext: "Name", Contexts: []context{mockContext}}
+var mockContext = Context{Name: "Name", Token: "dsajkhkg", GitlabURL: "https://example.com"}
+var mockCfg *configFile = &configFile{CurrentContext: "Name", Contexts: []Context{mockContext}}
 
 func readCfgMock() (*configFile, error) {
 	return mockCfg, nil

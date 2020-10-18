@@ -1,4 +1,4 @@
-package sdk
+package context
 
 import (
 	"errors"
@@ -14,7 +14,7 @@ var (
 	confFile       *configFile
 )
 
-type context struct {
+type Context struct {
 	Name      string `yaml:""`
 	Token     string `yaml:""`
 	GitlabURL string `yaml:""`
@@ -22,7 +22,7 @@ type context struct {
 
 type configFile struct {
 	CurrentContext string    `yaml:",omitempty"`
-	Contexts       []context `yaml:",omitempty"`
+	Contexts       []Context `yaml:",omitempty"`
 }
 
 type homeGetter func() (string, error)
@@ -88,21 +88,22 @@ func writeConfig(cf *configFile) error {
 	return nil
 }
 
-func getCurrentContext() (context, error) {
+// GetCurrentContext returns context struct obj for accessing connection informations
+func GetCurrentContext() (*Context, error) {
 	cf, err := getConfig(readConfig)
 	if err != nil {
-		return context{}, err
+		return nil, err
 	}
 	cur := cf.CurrentContext
 	if cur == "" {
-		return context{}, errors.New("Current context not set")
+		return nil, errors.New("Current context not set")
 	}
 	for _, ctx := range cf.Contexts {
 		if ctx.Name == cur {
-			return ctx, nil
+			return &ctx, nil
 		}
 	}
-	return context{}, errors.New("Current context not found in configFile")
+	return nil, errors.New("Current context not found in configFile")
 }
 
 // SetContext main function of set-context command
@@ -112,7 +113,7 @@ func SetContext(name, token, url string) error {
 		return err
 	}
 	cf.CurrentContext = name
-	newConfig := context{
+	newConfig := Context{
 		Name:      name,
 		Token:     token,
 		GitlabURL: url,

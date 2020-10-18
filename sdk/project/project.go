@@ -1,35 +1,41 @@
-package sdk
+package project
 
 import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"os"
 
-	"github.com/xanzy/go-gitlab"
+	"github.com/thobianchi/gitlabctl/internal/gitlab"
+	"github.com/thobianchi/gitlabctl/sdk/context"
+	gogitlab "github.com/xanzy/go-gitlab"
 )
 
 // GetEnv get environment
-func GetEnv(projectID string) {
-
-	git, err := getGitClient()
+func GetEnv(projectID string) error {
+	ctx, err := context.GetCurrentContext()
 	if err != nil {
-		log.Fatalf("Failed to get git client: %v", err)
+		return err
 	}
 
-	variables, _, err := git.ProjectVariables.ListVariables(projectID, nil)
+	client, err := gitlab.NewClient(ctx)
 	if err != nil {
-		fmt.Printf("Unable to fetch the variables:  %v\n", err)
-		os.Exit(1)
+		return err
+	}
+
+	variables, err := client.ListVariables(projectID)
+	if err != nil {
+		return err
 	}
 
 	for _, v := range variables {
 		// fmt.Printf("Key: %v, Value: %v, Kind %v\n", v.Key, v.Value, v.VariableType)
 		exportEnv(v.Key, v.Value, v.VariableType)
 	}
+
+	return nil
 }
 
-func exportEnv(varName, value string, kind gitlab.VariableTypeValue) {
+func exportEnv(varName, value string, kind gogitlab.VariableTypeValue) {
 	switch kind {
 	case "env_var":
 		exportVar(varName, value)

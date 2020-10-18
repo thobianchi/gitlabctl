@@ -52,7 +52,7 @@ changelog:
 # Homebrews
 brews:
   - name: gitlabctl
-    github:
+    tap:
       owner: thobianchi
       name: homebrew-tap
     commit_author:

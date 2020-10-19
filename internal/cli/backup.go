@@ -19,7 +19,6 @@ func BackupSubcommand(cmd *cobra.Command) {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return backup.Backup(groupName, groupID, clonePath)
 		},
-
 	}
 	cmd.AddCommand(backupCmd)
 	flags := backupCmd.PersistentFlags()

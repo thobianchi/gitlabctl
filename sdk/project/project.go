@@ -22,17 +22,69 @@ func GetEnv(projectID string) error {
 		return err
 	}
 
-	variables, err := client.ListVariables(projectID)
+	variables, err := listVariables(client, projectID)
 	if err != nil {
 		return err
 	}
 
-	for _, v := range variables {
-		// fmt.Printf("Key: %v, Value: %v, Kind %v\n", v.Key, v.Value, v.VariableType)
-		exportEnv(v.Key, v.Value, v.VariableType)
+	for _, variab := range variables {
+		switch v := variab.(type) {
+		case gogitlab.ProjectVariable:
+			exportEnv(v.Key, v.Value, v.VariableType)
+		case gogitlab.GroupVariable:
+			exportEnv(v.Key, v.Value, v.VariableType)
+		}
 	}
 
 	return nil
+}
+
+func listVariables(gitclient gitlab.IClient, projectID string) ([]gitlab.EnvVariable, error) {
+	prj, err := gitclient.GetProject(projectID)
+	if err != nil {
+		return nil, err
+	}
+
+	if prj.Namespace.Kind != "group" {
+		return nil, fmt.Errorf("Project parent namespace kind: %s not supported", prj.Namespace.Kind)
+	}
+
+	grp, err := gitclient.GetGroup(prj.Namespace.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	grpVars, err := gitclient.GetGrpVariables(prj.Namespace.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	for grp.ParentID != 0 {
+		NewgrpVars, err := gitclient.GetGrpVariables(grp.ParentID)
+		if err != nil {
+			return nil, err
+		}
+		grpVars = append(grpVars, NewgrpVars...)
+		grp, err = gitclient.GetGroup(grp.ParentID)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	prjVars, err := gitclient.GetPrjVariables(projectID)
+	if err != nil {
+		return nil, err
+	}
+
+	var variables []gitlab.EnvVariable
+	for _, x := range grpVars {
+		variables = append(variables, *x)
+	}
+	for _, y := range prjVars {
+		variables = append(variables, *y)
+	}
+
+	return variables, nil
 }
 
 func exportEnv(varName, value string, kind gogitlab.VariableTypeValue) {

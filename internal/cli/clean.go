@@ -5,7 +5,6 @@ import (
 	"github.com/thobianchi/gitlabctl/sdk/clean"
 )
 
-
 func CleanSubcommand(cmd *cobra.Command) {
 	cleanCmd := &cobra.Command{
 		Use:   "clean",

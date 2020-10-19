@@ -39,10 +39,10 @@ func main() {
 		Run: func(cmd *cobra.Command, args []string) {
 			cmd.Help()
 		},
-  }
+	}
 
-  // cli.AddGlobalFlags(rootCmd)
-  cli.ProjectSubcommand(rootCmd)
+	// cli.AddGlobalFlags(rootCmd)
+	cli.ProjectSubcommand(rootCmd)
 	cli.ProjectGetEnvSubcommand(rootCmd)
 	cli.ConfigSubcommand(rootCmd)
 	cli.ConfigCurrCtxSubcommand(rootCmd)

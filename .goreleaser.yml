@@ -4,7 +4,7 @@ before:
     - go mod download
     - go generate ./...
 release:
-  prerelease: false
+  prerelease: auto
 builds:
   - env:
       - CGO_ENABLED=0

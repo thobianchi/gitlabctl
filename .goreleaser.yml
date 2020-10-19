@@ -61,5 +61,6 @@ brews:
     folder: Formula
     homepage: https://github.com/thobianchi/gitlabctl
     description: Get Gitlab Project env Vars
+    skip_upload: auto
     test: |
       system "gitlabctl --version"

@@ -13,7 +13,7 @@ class Gitlab_client(object):
     def __init__(self, url="", token=""):
         self.gl = gitlab.Gitlab(url, private_token=token, per_page=PERPAGEOPT)
 
-    def get_project_by_id(self, id):
+    def get_project_by_id_or_ns_proj(self, id):
         return self.gl.projects.get(id)
 
     def get_group_by_id(self, id):

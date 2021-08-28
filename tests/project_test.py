@@ -50,7 +50,7 @@ def get_group_by_id(self, id):
 def test_get_all_parents_ids(mocker):
 
     mocker.patch(
-        'gitlabctl.client.Gitlab_client.get_project_by_id',
+        'gitlabctl.client.Gitlab_client.get_project_by_id_or_ns_proj',
         get_proj_by_id
     )
 

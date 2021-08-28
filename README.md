@@ -1,9 +1,5 @@
 # Gitlabctl
 
-[![Latest Release](https://img.shields.io/github/release/thobianchi/gitlabctl.svg?style=flat-square)](https://github.com/thobianchi/gitlabctl/releases/latest)
-[![Go Report Card](https://goreportcard.com/badge/github.com/thobianchi/gitlabctl)](https://goreportcard.com/report/github.com/thobianchi/gitlabctl)
-[![CI](https://github.com/thobianchi/gitlabctl/workflows/goreleaser/badge.svg)](https://github.com/thobianchi/gitlabctl/actions?query=workflow%3Agoreleaser)
-
 ## Overview
 
 This command line utility provides some commands to do operations on gitlab like, create repos, copy environment from project to local shell, launch pipeline and perhaps monitor it.

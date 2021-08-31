@@ -77,3 +77,18 @@ def get_env(client, id):
         proj = get_project_id_from_git_remote(client)
     vars = get_variable_list(client, proj)
     return format_variables(vars)
+
+
+def get_current_branch():
+    run = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"],
+                         capture_output=True, text=True)
+    if "fatal: not a git repository " in run.stderr:
+        print(run.stderr)
+        sys.exit(1)
+    return run.stdout.strip('\n')
+
+
+def run_pipeline(client, env_vars):
+    proj = get_project_id_from_git_remote(client)
+    branch = get_current_branch()
+    proj.pipelines.create({'ref': branch, 'variables': env_vars})

@@ -36,3 +36,12 @@ def project_get_env(by_id):
     vars = gitlab_project.get_env(client, by_id)
     for v in vars:
         click.echo(v)
+
+
+@project.command("run-pipeline")
+@click.argument("vars", nargs=-1)
+def my_command(vars):
+    cfg = config.get_config()
+    client = Gitlab_client(cfg['url'], cfg['token'])
+    d = [{'key': a.split('=')[0], 'value': a.split('=')[1]} for a in vars]
+    gitlab_project.run_pipeline(client, d)

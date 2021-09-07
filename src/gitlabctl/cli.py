@@ -3,8 +3,6 @@ import click
 
 import gitlabctl.project as gitlab_project
 from gitlabctl import __version__
-from gitlabctl.client import Gitlab_client
-from gitlabctl.config import config
 
 __author__ = "Thomas Bianchi"
 __copyright__ = "Thomas Bianchi"
@@ -31,17 +29,13 @@ def project_get_env(by_id):
     """
     Get project and anchestor environemnt and print export statements.
     """
-    cfg = config.get_config()
-    client = Gitlab_client(cfg['url'], cfg['token'])
-    vars = gitlab_project.get_env(client, by_id)
+    vars = gitlab_project.main(gitlab_project.get_env, by_id)
     for v in vars:
         click.echo(v)
 
 
 @project.command("run-pipeline")
 @click.argument("vars", nargs=-1)
-def my_command(vars):
-    cfg = config.get_config()
-    client = Gitlab_client(cfg['url'], cfg['token'])
+def run_pipeline(vars):
     d = [{'key': a.split('=')[0], 'value': a.split('=')[1]} for a in vars]
-    gitlab_project.run_pipeline(client, d)
+    gitlab_project.main(gitlab_project.run_pipeline, d)

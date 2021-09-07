@@ -2,6 +2,8 @@
 import click
 
 import gitlabctl.project as gitlab_project
+import gitlabctl.user as gitlab_user
+
 from gitlabctl import __version__
 
 __author__ = "Thomas Bianchi"
@@ -39,7 +41,27 @@ def project_get_env(by_id):
 def run_pipeline(vars):
     """
     Run pipeline for current checked-out branch passing vars
-    in form VAR1=VALUE VAR2=VALUE
+    in form VAR1=VALUE VAR2=VALUE.
     """
     d = [{'key': a.split('=')[0], 'value': a.split('=')[1]} for a in vars]
+    for _, v in d:
+        if any(elem in v for elem in r", "):
+            raise click.BadArgumentUsage("parameters should be in form 'VAR=1 RAV=2'")
     gitlab_project.main(gitlab_project.run_pipeline, d)
+
+
+@cli.group()
+def user():
+    """Manages user."""
+    pass
+
+
+@user.command("create")
+@click.option("-e", "--email", "email", required=True, type=str)
+@click.option("-u", "--username", "username", required=True, type=str)
+@click.option("-n", "--name", "name", required=True, type=str)
+def create_user(email, username, name):
+    """
+    Create user
+    """
+    gitlab_user.main(gitlab_user.create_user, email, username, name)

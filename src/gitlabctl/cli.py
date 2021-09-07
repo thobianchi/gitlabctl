@@ -27,7 +27,7 @@ def project():
 @click.option("--by-id", type=int)
 def project_get_env(by_id):
     """
-    Get project and anchestor environemnt and print export statements.
+    Get anchestor environemnt and print export statements.
     """
     vars = gitlab_project.main(gitlab_project.get_env, by_id)
     for v in vars:
@@ -37,5 +37,9 @@ def project_get_env(by_id):
 @project.command("run-pipeline")
 @click.argument("vars", nargs=-1)
 def run_pipeline(vars):
+    """
+    Run pipeline for current checked-out branch passing vars
+    in form VAR1=VALUE VAR2=VALUE
+    """
     d = [{'key': a.split('=')[0], 'value': a.split('=')[1]} for a in vars]
     gitlab_project.main(gitlab_project.run_pipeline, d)

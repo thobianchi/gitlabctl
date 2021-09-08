@@ -75,3 +75,19 @@ def create_user(email, username, name):
     Create user
     """
     gitlab_user.main(gitlab_user.create_user, email, username, name)
+
+
+@user.command("authorize")
+@click.option("-u", "--username", "username", required=True, type=str, multiple=True)
+@click.option("-g", "--group", "group", required=True, type=str, multiple=True,
+              help="group name")
+@click.option("-p", "--permission", "permission", required=True,
+              type=click.Choice(
+                               ['Owner', 'Maintainer', 'Reporter',
+                                'Developer', 'Guest'],
+                               case_sensitive=False))
+def authorize_user(username, group, permission):
+    """
+    Add user to member in group with permission
+    """
+    gitlab_user.main(gitlab_user.authorize, username, group, permission)

@@ -46,6 +46,7 @@ def run_pipeline(vars):
     d = [{'key': a.split('=')[0], 'value': a.split('=')[1]} for a in vars]
     for _, v in d:
         if any(elem in v for elem in r", "):
+            # FIXME non working
             raise click.BadArgumentUsage("parameters should be in form 'VAR=1 RAV=2'")
     gitlab_project.main(gitlab_project.run_pipeline, d)
 

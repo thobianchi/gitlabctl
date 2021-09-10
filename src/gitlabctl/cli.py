@@ -3,6 +3,7 @@ import click
 
 import gitlabctl.project as gitlab_project
 import gitlabctl.user as gitlab_user
+from gitlabctl.config import config
 
 from gitlabctl import __version__
 
@@ -11,9 +12,17 @@ __copyright__ = "Thomas Bianchi"
 __license__ = "mit"
 
 
+def set_config(ctx, param, value):
+    if not value or ctx.resilient_parsing:
+        return
+    config.set_filepath(click.format_filename(value))
+
+
 @click.group()
 @click.version_option(version=__version__)
-def cli():
+@click.option("--conf", type=click.Path(exists=True), callback=set_config,
+              is_eager=True, help="Set configuration file fullpath.")
+def cli(conf):
     """Gitlab CLI
     Interacts with a gitlab installation: gets environment of a project or launch
     pipeline and see output.

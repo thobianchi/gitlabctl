@@ -158,3 +158,8 @@ MANIFEST
 
 # Per-project virtualenvs
 .venv*/
+
+tests/gitlab-server/data
+tests/gitlab-server/config
+tests/gitlab-server/logs
+tests/gitlab-server/.gitlabctl.ini

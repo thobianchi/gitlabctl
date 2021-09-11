@@ -13,7 +13,8 @@ gl = None
 def create_user(email, username, name):
     gl.users.create({'email': email,
                      'username': username,
-                     'name': name})
+                     'name': name,
+                     'reset_password': True})  # Send user password reset link
     print(f"User {email} created")
 
 

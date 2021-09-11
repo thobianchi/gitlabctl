@@ -91,3 +91,9 @@ def authorize_user(username, group, permission):
     Add user to member in group with permission
     """
     gitlab_user.main(gitlab_user.authorize, username, group, permission)
+
+
+@user.command("block")
+@click.option("-u", "--username", "username", required=True, type=str, multiple=True)
+def block_user(username):
+    gitlab_user.main(gitlab_user.block, username)

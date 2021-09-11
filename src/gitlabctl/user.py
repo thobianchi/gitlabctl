@@ -29,6 +29,13 @@ def do_auth(group, user, permission):
             raise e
 
 
+def search_user_by_username(username):
+    found_list = gl.users.list(username=username)
+    if len(found_list) != 1:
+        raise Exception("User not found")
+    return found_list[0]
+
+
 def authorize(username_list, group_list, permission):
     perm_parsed = getattr(gitlab, f"{permission.upper()}_ACCESS")
     user_group = list(itertools.product(username_list, group_list))
@@ -36,11 +43,18 @@ def authorize(username_list, group_list, permission):
         found_list = gl.users.list(username=couple[0])
         if len(found_list) != 1:
             raise Exception("Error searching for users")
+        user = search_user_by_username(couple[0])
         group = gl.groups.get(couple[1])
-        user = found_list[0]
         print(f"adding member {user.name} with permission {permission} \
 to group {group.name}")
         do_auth(group, user, perm_parsed)
+
+
+def block(username_list):
+    for username in username_list:
+        user = search_user_by_username(username)
+        print(f"Blocking user {user.name}")
+        user.block()
 
 
 def main(fn, *args):
